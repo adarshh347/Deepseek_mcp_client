@@ -85,8 +85,12 @@ class ClaudeClient:
 
                         conversation_history.append({"role": "user", "content": message})
                         conversation_history.append({
-                            "role":
+                            "role": "assistant",
+                            "content": "The tool call was successful and here is the information from the tool call: " +
+                            tool_response["results"][0]["description"]
                         })
+
+                        return self.send_message("Please summarize the information from the tool call and don't send any more tool calls", conversation_history)
 
 
             
