@@ -91,7 +91,44 @@ class ClaudeClient:
                         })
 
                         return self.send_message("Please summarize the information from the tool call and don't send any more tool calls", conversation_history)
+                    if not has_tool_call:
+                        print("no tool calls")
+                return result
+        def _handle_tool_call(self, tool_call: Dict[str,Any]) -> Dict[str,Any]:
+            tool_name = tool_call.get("name")
+            tool_params = tool_call.get("parameters")
 
+            if not self.check_mcp_server():
+                return {
+                    "results": [{
+                        "description":"MCP server is not available"
+                    }]
+                }
+
+            max_retries = 3
+            retry_count=0
+
+            while retry_count < max_retries:
+                try:
+                    response = requests.post{
+                        f"{MCP_SERVER_URL}/tool_call",
+                        json={"name":tool_name, "parameters":tool_params},
+                        timeout=10
+
+                    }    
+                    response.raise_for_status()
+                    return response.json()
+                except Exception as e:
+                    retry_count+=1
+                    if retry_count < max_retries:
+                        wait_time = 2** retry_count
+                        time.sleep(wait_time)
+                    else:
+                        return{
+                            "results": [{
+                                "description":"MACP server not responding"
+                            }]
+                        } 
 
             
 
