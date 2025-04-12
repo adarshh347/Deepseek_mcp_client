@@ -126,9 +126,24 @@ class ClaudeClient:
                     else:
                         return{
                             "results": [{
-                                "description":"MACP server not responding"
+                                "description":"MCP server not responding"
                             }]
-                        } 
+                        }
+        def get_final_answer(self, message:str) -> str:
+            try:
+                response = self.send_message(message)
+                if isinstance(response,dict):
+                    choices = response.get("choices",[])
+                    if choices:
+                        message_block = choices[0].get("message",{})
+                        content = message_block.get("content",[])
+                        if content:
+                            return content.strip()
+                return "No clear answer found"
+            
+            except Exception as e:
+                return f"Error: {e}"
+
 
             
 

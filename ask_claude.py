@@ -29,7 +29,7 @@ def main():
         query = " ".join(args.query)
     else:
         query = input("Ask Claude")
-    client = ClaudeClient()
+    client = ClaudeMCPClient()
     print(f"Searching for{query}")
 
     try:
